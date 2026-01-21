@@ -1,0 +1,94 @@
+diff --git a/public/index.html b/public/index.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..ad28dcfab2a918d5231cc93e2e25fd3497c96db8
+--- /dev/null
++++ b/public/index.html
+@@ -0,0 +1,88 @@
++<!DOCTYPE html>
++<html lang="es">
++  <head>
++    <meta charset="UTF-8" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <title>Panel de Bots - Estado y Resultados</title>
++    <link rel="stylesheet" href="styles.css" />
++  </head>
++  <body>
++    <div class="app">
++      <header>
++        <div>
++          <p class="eyebrow">Monitor en tiempo real</p>
++          <h1>Panel de Bots y Simulación</h1>
++          <p class="subtitle">
++            Configura la ejecución, visualiza métricas y valida el desempeño del simulador.
++          </p>
++        </div>
++        <div class="status-card">
++          <span class="status-label">Estado de ejecución</span>
++          <div class="status-value" id="executionStatus">Detenido</div>
++          <span class="status-meta" id="lastUpdated">Última actualización: --</span>
++        </div>
++      </header>
++
++      <main>
++        <section class="panel config">
++          <h2>Opciones configurables</h2>
++          <div class="field">
++            <label for="botCount">Número de bots</label>
++            <input type="number" id="botCount" min="1" max="500" value="24" />
++          </div>
++          <div class="field">
++            <label for="simulator">Simulador</label>
++            <select id="simulator">
++              <option value="quantum">Quantum Sim</option>
++              <option value="classical">Clásico</option>
++              <option value="hybrid">Híbrido</option>
++            </select>
++          </div>
++          <div class="field">
++            <label for="isRunning">Estado de ejecución</label>
++            <select id="isRunning">
++              <option value="running">En ejecución</option>
++              <option value="paused">Pausado</option>
++              <option value="stopped">Detenido</option>
++            </select>
++          </div>
++          <button id="applyConfig">Aplicar configuración</button>
++          <p class="hint">
++            Las opciones se reflejan en el modo demo mientras se conecta el backend.
++          </p>
++        </section>
++
++        <section class="panel results">
++          <div class="results-header">
++            <h2>Resultados en vivo</h2>
++            <span class="pill" id="dataMode">Modo demo</span>
++          </div>
++          <div class="metrics">
++            <article>
++              <h3>Transacciones procesadas</h3>
++              <p id="txCount">--</p>
++            </article>
++            <article>
++              <h3>Latencia promedio</h3>
++              <p id="latency">-- ms</p>
++            </article>
++            <article>
++              <h3>Exactitud</h3>
++              <p id="accuracy">-- %</p>
++            </article>
++            <article>
++              <h3>Bloques minados</h3>
++              <p id="blocks">--</p>
++            </article>
++          </div>
++          <div class="log-panel">
++            <h3>Eventos recientes</h3>
++            <ul id="eventLog"></ul>
++          </div>
++        </section>
++      </main>
++    </div>
++
++    <script src="app.js"></script>
++  </body>
++</html>
