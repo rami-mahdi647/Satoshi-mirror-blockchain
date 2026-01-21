@@ -1,0 +1,45 @@
+# Importamos las bibliotecas necesarias de Qiskit
+from qiskit import QuantumCircuit, Aer, execute
+from qiskit.visualization import plot_histogram
+
+# Creamos un circuito cuántico con 2 qubits y 2 bits clásicos para medir
+qc = QuantumCircuit(2, 2)
+
+# Paso 1: Inicializamos los qubits en estados diferentes
+# Qubit 0 (línea temporal A) comienza en |0>
+# Qubit 1 (línea temporal B) lo ponemos en |1> aplicando una compuerta X
+qc.x(1)
+
+# Paso 2: Evolución temporal en cada línea
+# Aplicamos una compuerta Hadamard a A (qubit 0) para simular alguna dinámica
+qc.h(0)
+# Aplicamos una compuerta Pauli-X a B (qubit 1) para otra dinámica
+qc.x(1)
+
+# Paso 3: Simulamos el agujero de gusano con una compuerta SWAP
+# Esto intercambia los estados de las dos líneas temporales
+qc.swap(0, 1)
+
+# Paso 4: Más evolución temporal después del agujero de gusano
+# Aplicamos otra Hadamard a A (qubit 0)
+qc.h(0)
+
+# Paso 5: Medimos los qubits
+qc.measure([0, 1], [0, 1])
+
+# Visualizamos el circuito
+print("Diagrama del circuito cuántico:")
+print(qc.draw())
+
+# Ejecutamos la simulación en el simulador de Qiskit
+simulator = Aer.get_backend('qasm_simulator')
+job = execute(qc, simulator, shots=1024)
+result = job.result()
+counts = result.get_counts()
+
+# Mostramos los resultados
+print("\nResultados de la medición:")
+print(counts)
+
+# Graficamos un histograma de los resultados
+plot_histogram(counts)
