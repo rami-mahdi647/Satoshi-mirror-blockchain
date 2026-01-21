@@ -1,59 +1,61 @@
-diff --git a/Whormole b/Whormole
-index 62217c542058734968a53cc1e89dcb046e59673d..5d11a55be37bcd2e7b92dc139bd9931db20b8272 100644
---- a/Whormole
-+++ b/Whormole
-@@ -1,45 +1,54 @@
- # Importamos las bibliotecas necesarias de Qiskit
-+from pathlib import Path
-+
- from qiskit import QuantumCircuit, Aer, execute
- from qiskit.visualization import plot_histogram
- 
-+from src.qbist.encoder import write_qbist_json
-+
- # Creamos un circuito cuántico con 2 qubits y 2 bits clásicos para medir
- qc = QuantumCircuit(2, 2)
- 
- # Paso 1: Inicializamos los qubits en estados diferentes
- # Qubit 0 (línea temporal A) comienza en |0>
- # Qubit 1 (línea temporal B) lo ponemos en |1> aplicando una compuerta X
- qc.x(1)
- 
- # Paso 2: Evolución temporal en cada línea
- # Aplicamos una compuerta Hadamard a A (qubit 0) para simular alguna dinámica
- qc.h(0)
- # Aplicamos una compuerta Pauli-X a B (qubit 1) para otra dinámica
- qc.x(1)
- 
- # Paso 3: Simulamos el agujero de gusano con una compuerta SWAP
- # Esto intercambia los estados de las dos líneas temporales
- qc.swap(0, 1)
- 
- # Paso 4: Más evolución temporal después del agujero de gusano
- # Aplicamos otra Hadamard a A (qubit 0)
- qc.h(0)
- 
- # Paso 5: Medimos los qubits
- qc.measure([0, 1], [0, 1])
- 
-+# Exportamos el circuito al formato QBIST
-+output_path = Path(__file__).with_suffix(".qbist.json")
-+write_qbist_json(qc, output_path, seed=42, metadata={"source": "Whormole"})
-+print(f"\nCircuito exportado a QBIST en: {output_path}")
-+
- # Visualizamos el circuito
- print("Diagrama del circuito cuántico:")
- print(qc.draw())
- 
- # Ejecutamos la simulación en el simulador de Qiskit
- simulator = Aer.get_backend('qasm_simulator')
- job = execute(qc, simulator, shots=1024)
- result = job.result()
- counts = result.get_counts()
- 
- # Mostramos los resultados
- print("\nResultados de la medición:")
- print(counts)
- 
- # Graficamos un histograma de los resultados
- plot_histogram(counts)
+# Formato QBIST (Quantum Binary Serialization Toolkit)
+
+El formato **QBIST** describe circuitos cuánticos como un JSON autocontenido. Está pensado para
+exportar circuitos de Qiskit o de una estructura propia a una representación común.
+
+## Esquema
+
+El JSON debe contener estos campos principales:
+
+- `qubits`: lista de identificadores de qubits (enteros).
+- `operations`: lista de operaciones aplicadas sobre los qubits.
+- `metadata`: metadatos asociados al circuito.
+
+### Operación
+
+Cada operación es un objeto con los siguientes campos:
+
+- `name`: nombre de la compuerta u operación.
+- `qubits`: lista de índices de qubits involucrados.
+- `clbits`: lista de bits clásicos afectados (puede estar vacía).
+- `params`: lista de parámetros serializados (números o cadenas).
+
+### Metadatos
+
+Los metadatos incluyen:
+
+- `timestamp`: fecha/hora UTC en formato ISO-8601.
+- `seed`: semilla opcional usada para reproducibilidad.
+
+## Ejemplo de entrada (estructura propia)
+
+```json
+{
+  "qubits": [0, 1],
+  "operations": [
+    {"name": "x", "qubits": [1], "clbits": [], "params": []},
+    {"name": "h", "qubits": [0], "clbits": [], "params": []},
+    {"name": "swap", "qubits": [0, 1], "clbits": [], "params": []},
+    {"name": "measure", "qubits": [0, 1], "clbits": [0, 1], "params": []}
+  ],
+  "metadata": {"seed": 42}
+}
+```
+
+## Ejemplo de salida QBIST
+
+```json
+{
+  "qubits": [0, 1],
+  "operations": [
+    {"name": "x", "qubits": [1], "clbits": [], "params": []},
+    {"name": "h", "qubits": [0], "clbits": [], "params": []},
+    {"name": "swap", "qubits": [0, 1], "clbits": [], "params": []},
+    {"name": "measure", "qubits": [0, 1], "clbits": [0, 1], "params": []}
+  ],
+  "metadata": {
+    "timestamp": "2024-01-21T14:10:00+00:00",
+    "seed": 42
+  }
+}
+```
